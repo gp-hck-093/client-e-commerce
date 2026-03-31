@@ -35,8 +35,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(180deg,#fff7ed_0%,#fffdf8_32%,#f8fafc_100%)] px-4 py-8 lg:px-8 lg:py-10">
-      <div className="mx-auto grid w-full max-w-7xl items-stretch gap-6 lg:grid-cols-[1fr_1fr]">
+    <div className="min-h-screen flex items-center justify-center bg-[linear-gradient(180deg,#fff7ed_0%,#fffdf8_32%,#f8fafc_100%)] px-4">
+      <div className="w-full max-w-7xl grid lg:grid-cols-2 gap-6 items-center">
         <div className="auth-enter-left h-full [&>*]:h-full">
           <AuthShowcase variant="login" />
         </div>

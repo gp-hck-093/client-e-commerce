@@ -22,7 +22,8 @@ const contentMap = {
   },
   register: {
     eyebrow: "Join ZapShop",
-    title: "Bikin akun baru dan mulai belanja dengan gaya yang sama seperti home.",
+    title:
+      "Bikin akun baru dan mulai belanja dengan gaya yang sama seperti home.",
     description:
       "Daftar untuk simpan alamat, pantau pesanan, dan checkout lebih cepat kapan saja.",
     ctaLabel: "Jelajahi produk",
@@ -63,7 +64,9 @@ export default function AuthShowcase({ variant = "login" }) {
                 <span className="text-orange-300">Zap</span>
                 <span className="text-white">Shop</span>
               </p>
-              <p className="text-sm text-white/80">Modern everyday marketplace</p>
+              <p className="text-sm text-white/80">
+                Modern everyday marketplace
+              </p>
             </div>
           </div>
 
@@ -94,7 +97,9 @@ export default function AuthShowcase({ variant = "login" }) {
               key={item.label}
               className="rounded-2xl border border-white/15 bg-white/12 p-4 backdrop-blur-sm"
             >
-              <p className="text-2xl font-black text-orange-200">{item.value}</p>
+              <p className="text-2xl font-black text-orange-200">
+                {item.value}
+              </p>
               <p className="mt-1 text-xs font-medium uppercase tracking-[0.2em] text-white/75">
                 {item.label}
               </p>
