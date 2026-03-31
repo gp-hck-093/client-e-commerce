@@ -56,13 +56,14 @@ export function CartProvider({ children }) {
       fetchCart(); // refresh cart dari DB
     } catch (err) {
       console.error("Failed to add to cart:", err);
-      showToast("Failed to add item 😢");
+      // Check for backend error message
+      const msg = err.response?.data?.message || "Failed to add item 😢";
+      showToast(msg);
     }
   };
 
   // UPDATE qty → PUT /carts/:id
   const updateQty = async (id, newQty) => {
-    if (newQty < 1 || newQty > 99) return;
     try {
       await api.put(
         `/carts/${id}`,
@@ -76,6 +77,8 @@ export function CartProvider({ children }) {
       fetchCart(); // refresh cart dari DB
     } catch (err) {
       console.error("Failed to update qty:", err);
+      const msg = err.response?.data?.message || "Failed to update qty";
+      showToast(msg);
     }
   };
 
