@@ -54,8 +54,8 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(180deg,#fff7ed_0%,#fffdf8_32%,#f8fafc_100%)] px-4 py-8 lg:px-8 lg:py-10">
-      <div className="mx-auto grid w-full max-w-7xl items-stretch gap-6 lg:grid-cols-[1fr_1fr]">
+    <div className="min-h-screen flex items-center justify-center bg-[linear-gradient(180deg,#fff7ed_0%,#fffdf8_32%,#f8fafc_100%)] px-4">
+      <div className="w-full max-w-7xl grid lg:grid-cols-2 gap-6 items-center">
         <div className="auth-enter-left relative h-full min-h-[760px] overflow-hidden rounded-[2rem] border border-orange-100 bg-white/90 p-8 shadow-[0_30px_80px_rgba(15,23,42,0.08)] backdrop-blur xl:p-10">
           <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500" />
           <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-orange-100/70 blur-3xl" />
@@ -81,7 +81,8 @@ export default function Register() {
                 </div>
               )}
 
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-5 md:grid-cols-2">
+                {/* NAME (FULL WIDTH) */}
                 <div className="group relative text-left md:col-span-2">
                   <label className="mb-2 ml-1 block text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400">
                     Nama Lengkap
@@ -102,6 +103,7 @@ export default function Register() {
                   </div>
                 </div>
 
+                {/* EMAIL */}
                 <div className="group relative text-left">
                   <label className="mb-2 ml-1 block text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400">
                     Email Address
@@ -122,6 +124,7 @@ export default function Register() {
                   </div>
                 </div>
 
+                {/* PASSWORD */}
                 <div className="group relative text-left">
                   <label className="mb-2 ml-1 block text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400">
                     Password
@@ -141,7 +144,7 @@ export default function Register() {
                     />
                     <button
                       type="button"
-                      className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 transition hover:text-[#1E2A39]"
+                      className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-[#1E2A39]"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
@@ -153,7 +156,8 @@ export default function Register() {
                   </div>
                 </div>
 
-                <div className="group relative text-left">
+                {/* PHONE */}
+                <div className="group relative text-left md:col-span-2">
                   <label className="mb-2 ml-1 block text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400">
                     Phone Number
                   </label>
@@ -162,7 +166,7 @@ export default function Register() {
                       <FiPhone size={18} />
                     </div>
                     <input
-                      type="number"
+                      type="text"
                       required
                       className={inputClassName}
                       placeholder="08xx-xxxx-xxxx"
@@ -173,6 +177,7 @@ export default function Register() {
                   </div>
                 </div>
 
+                {/* ADDRESS (FULL WIDTH) */}
                 <div className="group relative text-left md:col-span-2">
                   <label className="mb-2 ml-1 block text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400">
                     Address
