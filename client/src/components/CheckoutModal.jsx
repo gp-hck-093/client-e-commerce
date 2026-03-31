@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import {
-  FaTimes,
-  FaMapMarkerAlt,
-  FaCreditCard,
-  FaCheckCircle,
-} from "react-icons/fa";
+import { FaTimes, FaCreditCard, FaCheckCircle } from "react-icons/fa";
+import api from "../api/api";
 
 const PAYMENT_METHODS = [
   "Credit Card",
@@ -24,32 +20,37 @@ export default function CheckoutModal({
 }) {
   const navigate = useNavigate();
   const [selectedPayment, setSelectedPayment] = useState("Credit Card");
-  const [address, setAddress] = useState("");
   const [confirmed, setConfirmed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleConfirm = () => {
-    if (!address.trim()) {
-      alert("Please enter your shipping address.");
-      return;
+  const handleConfirm = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const { data } = await api.post(
+        "/orders/checkout",
+        { paymentMethod: selectedPayment },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        },
+      );
+      sessionStorage.setItem("newOrderId", data.orderId);
+      setConfirmed(true);
+
+      setTimeout(() => {
+        onConfirm();
+        navigate("/orders");
+      }, 1500);
+    } catch (err) {
+      setError("Checkout failed. Please try again.");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-    setConfirmed(true);
-
-    const orderData = {
-      id: Date.now(), // nanti dari response API
-      totalPrice: total,
-      status: "pending",
-      paymentMethod: selectedPayment,
-      address,
-      items: cartItems,
-      subtotal,
-      shipping,
-      createdAt: new Date().toISOString(),
-    };
-
-    setTimeout(() => {
-      onConfirm();
-      navigate("/orders", { state: { newOrder: orderData } });
-    }, 1500);
   };
 
   return (
@@ -76,7 +77,6 @@ export default function CheckoutModal({
         </div>
 
         {confirmed ? (
-          /* SUCCESS STATE */
           <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
             <FaCheckCircle className="text-6xl text-orange-500 mb-4" />
             <h3 className="text-xl font-bold text-gray-800 mb-1">
@@ -90,7 +90,7 @@ export default function CheckoutModal({
           <div className="px-6 py-5 space-y-6">
             {/* ORDER ITEMS */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">
                 🛍️ Items Ordered
               </h3>
               <div className="space-y-3">
@@ -106,11 +106,12 @@ export default function CheckoutModal({
                         {item.name}
                       </p>
                       <p className="text-xs text-gray-400">
-                        {item.qty} × ${item.price.toFixed(2)}
+                        {item.qty} × Rp{" "}
+                        {Number(item.price).toLocaleString("id-ID")}
                       </p>
                     </div>
                     <p className="text-sm font-semibold text-orange-500 shrink-0">
-                      ${(item.price * item.qty).toFixed(2)}
+                      Rp {(item.price * item.qty).toLocaleString("id-ID")}
                     </p>
                   </div>
                 ))}
@@ -143,22 +144,6 @@ export default function CheckoutModal({
 
             <hr className="border-dashed border-gray-200" />
 
-            {/* SHIPPING ADDRESS */}
-            <div>
-              <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                <FaMapMarkerAlt className="text-orange-500" /> Shipping Address
-              </h3>
-              <textarea
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="Enter your full shipping address..."
-                rows={3}
-                className="w-full text-sm border-2 border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-orange-400 transition resize-none text-gray-700 placeholder-gray-300"
-              />
-            </div>
-
-            <hr className="border-dashed border-gray-200" />
-
             {/* PRICE SUMMARY */}
             <div className="space-y-2">
               <h3 className="text-sm font-semibold text-gray-700 mb-3">
@@ -166,24 +151,32 @@ export default function CheckoutModal({
               </h3>
               <div className="flex justify-between text-sm text-gray-500">
                 <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>Rp {subtotal.toLocaleString("id-ID")}</span>
               </div>
               <div className="flex justify-between text-sm text-gray-500">
                 <span>Shipping</span>
-                <span>${shipping.toFixed(2)}</span>
+                <span>Rp {shipping.toLocaleString("id-ID")}</span>
               </div>
               <div className="flex justify-between text-base font-bold text-gray-800 pt-2 border-t border-dashed border-gray-200">
                 <span>Total</span>
-                <span className="text-orange-500">${total.toFixed(2)}</span>
+                <span className="text-orange-500">
+                  Rp {total.toLocaleString("id-ID")}
+                </span>
               </div>
             </div>
+
+            {/* ERROR */}
+            {error && (
+              <p className="text-red-500 text-xs text-center">{error}</p>
+            )}
 
             {/* CONFIRM BUTTON */}
             <button
               onClick={handleConfirm}
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl transition text-sm"
+              disabled={loading}
+              className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white font-semibold py-3 rounded-xl transition text-sm"
             >
-              Confirm Order
+              {loading ? "Processing..." : "Confirm Order"}
             </button>
           </div>
         )}
