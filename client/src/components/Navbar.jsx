@@ -14,6 +14,7 @@ export default function Navbar() {
 
   return (
     <div className="w-full bg-gray-100 px-6 py-3 flex items-center justify-between">
+      
       {/* LOGO */}
       <div className="flex items-center gap-2">
         <div className="bg-orange-500 text-white p-2 rounded-full">⚡</div>
