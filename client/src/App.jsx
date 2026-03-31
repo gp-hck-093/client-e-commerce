@@ -10,7 +10,6 @@ import Home from "./pages/Home";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Order from "./pages/Order";
-import OrderDetail from "./pages/OrderDetail";
 
 function App() {
   return (
@@ -41,15 +40,6 @@ function App() {
           element={
             <ProtectedRoute>
               <Order />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/orders/:id"
-          element={
-            <ProtectedRoute>
-              <OrderDetail />
             </ProtectedRoute>
           }
         />
