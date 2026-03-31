@@ -7,7 +7,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
-import ProductDetail from "./pages/ProductDetail";
+import ProductDetail from "./components/ProductDetail";
 import Cart from "./pages/Cart";
 import Order from "./pages/Order";
 
