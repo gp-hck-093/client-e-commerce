@@ -79,7 +79,11 @@ function StatusBadge({ status }) {
   );
 }
 
-function OrderCard({ order, isNew = false, onPay }) {
+const handleCancelOrder = async (orderId) => {
+  // Kita pindahkan ke komponen utama agar state-nya terjaga
+};
+
+function OrderCard({ order, isNew = false, onPay, onCancel }) {
   const [expanded, setExpanded] = useState(isNew);
   const [items, setItems] = useState([]);
   const [loadingItems, setLoadingItems] = useState(false);
@@ -203,14 +207,22 @@ function OrderCard({ order, isNew = false, onPay }) {
             </div>
           </div>
 
-          {/* PAY BUTTON */}
+          {/* ACTION BUTTONS */}
           {order.status === "pending" && (
-            <button
-              onClick={() => onPay(order)}
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2"
-            >
-              <FaCreditCard /> Pay Now
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={(e) => { e.stopPropagation(); onCancel(order.id); }}
+                className="flex-1 bg-white border border-gray-200 text-gray-500 hover:bg-gray-50 font-semibold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2 shadow-sm"
+              >
+                <FaTimesCircle /> Cancel
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); onPay(order); }}
+                className="flex-[2] bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2 shadow-md"
+              >
+                <FaCreditCard /> Pay Now
+              </button>
+            </div>
           )}
         </div>
       )}
@@ -226,6 +238,10 @@ export default function Order() {
     // tangkap newOrderId dari sessionStorage kalau baru checkout
     sessionStorage.getItem("newOrderId") || null,
   );
+
+  // State untuk modal konfirmasi pembatalan
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [selectedOrderToCancel, setSelectedOrderToCancel] = useState(null);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -246,10 +262,31 @@ export default function Order() {
     fetchOrders();
   }, []);
 
-  // const handlePay = (order) => {
-  //   // nanti disambungin ke Midtrans Snap
-  //   alert(`Redirecting to Midtrans payment for Order #${order.id}...`);
-  // };
+  const handleCancelOrder = async (orderId) => {
+    try {
+      await api.patch(
+        `/orders/${orderId}/cancel`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        },
+      );
+      // Update local state instead of reload for smoother feel
+      setOrders(prev => prev.map(o => o.id === orderId ? {...o, status: 'failed'} : o));
+      setShowCancelModal(false);
+      setSelectedOrderToCancel(null);
+    } catch (error) {
+      console.error("Cancel error:", error);
+      alert(error.response?.data?.message || "Failed to cancel order");
+    }
+  };
+
+  const openCancelModal = (orderId) => {
+    setSelectedOrderToCancel(orderId);
+    setShowCancelModal(true);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-6 pb-20">
@@ -294,8 +331,42 @@ export default function Order() {
               order={order}
               isNew={String(order.id) === String(newOrderId)}
               onPay={handlePay}
+              onCancel={openCancelModal} // Pass function down
             />
           ))}
+        </div>
+      )}
+
+      {/* CUSTOM CANCEL MODAL */}
+      {showCancelModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl scale-in-center overflow-hidden relative">
+            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-400 to-orange-400"></div>
+            <div className="flex flex-col items-center text-center">
+              <div className="bg-red-50 p-4 rounded-full text-red-500 mb-4 animate-bounce">
+                <FaTimesCircle size={40} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Cancel Order?</h3>
+              <p className="text-sm text-gray-500 mb-8 px-2">
+                Are you sure you want to cancel **#Order {selectedOrderToCancel}**? This action cannot be undone.
+              </p>
+              
+              <div className="flex gap-3 w-full">
+                <button
+                  onClick={() => setShowCancelModal(false)}
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-3.5 rounded-2xl transition-all"
+                >
+                  Go Back
+                </button>
+                <button
+                  onClick={() => handleCancelOrder(selectedOrderToCancel)}
+                  className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-red-200 transition-all active:scale-95"
+                >
+                  Yes, Cancel
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
