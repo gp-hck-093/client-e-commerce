@@ -31,6 +31,43 @@ const STATUS_CONFIG = {
   },
 };
 
+const handlePay = async (order) => {
+  try {
+    const { data } = await api.post(
+      `/orders/${order.id}/pay`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      },
+    );
+
+    const snapToken = data.snapToken;
+
+    window.snap.pay(snapToken, {
+      onSuccess: function (result) {
+        alert("Payment success!");
+        console.log(result);
+        window.location.reload();
+      },
+      onPending: function (result) {
+        alert("Payment pending!");
+        console.log(result);
+      },
+      onError: function (result) {
+        alert("Payment failed!");
+        console.log(result);
+      },
+      onClose: function () {
+        alert("Payment popup closed");
+      },
+    });
+  } catch (error) {
+    console.error("Payment error:", error);
+  }
+};
+
 function StatusBadge({ status }) {
   const config = STATUS_CONFIG[status] || STATUS_CONFIG.pending;
   return (
@@ -209,10 +246,10 @@ export default function Order() {
     fetchOrders();
   }, []);
 
-  const handlePay = (order) => {
-    // nanti disambungin ke Midtrans Snap
-    alert(`Redirecting to Midtrans payment for Order #${order.id}...`);
-  };
+  // const handlePay = (order) => {
+  //   // nanti disambungin ke Midtrans Snap
+  //   alert(`Redirecting to Midtrans payment for Order #${order.id}...`);
+  // };
 
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-6 pb-20">
