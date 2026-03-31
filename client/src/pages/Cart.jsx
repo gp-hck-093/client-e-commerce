@@ -8,65 +8,36 @@ import {
   FaArrowLeft,
   FaTag,
 } from "react-icons/fa";
-
 import { useNavigate } from "react-router";
-
-// TEMP DATA - simulasi item yang sudah di-add ke keranjang
-const initialCartItems = [
-  {
-    id: 1,
-    name: "Wireless Headphones",
-    price: 79.99,
-    qty: 2,
-    description: "Premium headphones",
-    imageUrl: "https://images.unsplash.com/photo-1518444065439-e933c06ce9cd",
-    category: "Electronics",
-  },
-  {
-    id: 3,
-    name: "Smart Watch",
-    price: 149.99,
-    qty: 1,
-    description: "Fitness tracking",
-    imageUrl: "https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b",
-    category: "Accessories",
-  },
-  {
-    id: 4,
-    name: "Leather Bag",
-    price: 119.99,
-    qty: 1,
-    description: "Premium bag",
-    imageUrl: "https://images.unsplash.com/photo-1584917865442-de89df76afd3",
-    category: "Fashion",
-  },
-];
+import { useCart } from "../context/CartContext";
+import { useEffect } from "react";
 
 export default function Cart() {
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState(initialCartItems);
+  const { cartItems, updateQty, deleteItem, clearCart, fetchCart } = useCart();
   const [deletingId, setDeletingId] = useState(null);
   const [notification, setNotification] = useState(null);
   const [showCheckout, setShowCheckout] = useState(false);
+
   const showNotification = (message, type = "success") => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 2500);
   };
 
+  useEffect(() => {
+    fetchCart();
+  }, []);
+
   // UPDATE qty
   const handleUpdateQty = (id, newQty) => {
-    if (newQty < 1) return;
-    if (newQty > 99) return;
-    setCartItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, qty: newQty } : item)),
-    );
+    updateQty(id, newQty); // ← pakai context
   };
 
   // DELETE item
   const handleDelete = (id) => {
     setDeletingId(id);
     setTimeout(() => {
-      setCartItems((prev) => prev.filter((item) => item.id !== id));
+      deleteItem(id); // ← pakai context
       setDeletingId(null);
       showNotification("Item removed from cart.");
     }, 300);
@@ -74,7 +45,7 @@ export default function Cart() {
 
   // CLEAR CART
   const handleClearCart = () => {
-    setCartItems([]);
+    clearCart(); // ← pakai context
     showNotification("Cart has been cleared.");
   };
 
@@ -169,7 +140,7 @@ export default function Cart() {
                   />
                   <span className="absolute top-2 left-2 bg-purple-500 text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
                     <FaTag className="text-[9px]" />
-                    {item.category}
+                    {item.category || item.Category?.name}
                   </span>
                 </div>
 
@@ -197,13 +168,13 @@ export default function Cart() {
                   <div className="flex justify-between items-center mt-3">
                     {/* PRICE */}
                     <p className="text-orange-500 font-bold text-lg">
-                      ${(item.price * item.qty).toFixed(2)}
+                      Rp {(item.price * item.qty).toLocaleString("id-ID")}
                       <span className="text-gray-400 text-xs font-normal ml-1">
-                        (${item.price} each)
+                        (Rp {Number(item.price).toLocaleString("id-ID")} each)
                       </span>
                     </p>
 
-                    {/* QTY EDITOR (EDIT / UPDATE) */}
+                    {/* QTY EDITOR */}
                     <div className="flex items-center gap-2 bg-gray-100 rounded-full px-2 py-1">
                       <button
                         onClick={() => handleUpdateQty(item.id, item.qty - 1)}
@@ -258,7 +229,9 @@ export default function Cart() {
                       {item.name}{" "}
                       <span className="text-gray-400">×{item.qty}</span>
                     </span>
-                    <span>${(item.price * item.qty).toFixed(2)}</span>
+                    <span>
+                      Rp {(item.price * item.qty).toLocaleString("id-ID")}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -268,11 +241,11 @@ export default function Cart() {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between text-gray-500">
                   <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>Rp {subtotal.toLocaleString("id-ID")}</span>
                 </div>
                 <div className="flex justify-between text-gray-500">
                   <span>Shipping</span>
-                  <span>${shipping.toFixed(2)}</span>
+                  <span>Rp {shipping.toLocaleString("id-ID")}</span>
                 </div>
               </div>
 
@@ -281,7 +254,7 @@ export default function Cart() {
               <div className="flex justify-between font-bold text-gray-800">
                 <span>Total</span>
                 <span className="text-orange-500 text-lg">
-                  ${total.toFixed(2)}
+                  Rp {total.toLocaleString("id-ID")}
                 </span>
               </div>
 
@@ -302,6 +275,7 @@ export default function Cart() {
           </div>
         </div>
       )}
+
       {showCheckout && (
         <CheckoutModal
           cartItems={cartItems}
@@ -310,7 +284,7 @@ export default function Cart() {
           total={total}
           onClose={() => setShowCheckout(false)}
           onConfirm={() => {
-            // nanti disambungin ke API POST /orders
+            clearCart();
             setShowCheckout(false);
           }}
         />

@@ -1,6 +1,18 @@
 import { FaShoppingCart, FaEye } from "react-icons/fa";
+import { useCart } from "../context/CartContext";
+import { useNavigate } from "react-router"; // ← tambah ini
 
 export default function CardHome({ product, onView }) {
+  const { addToCart } = useCart();
+  const navigate = useNavigate();
+
+  const handleAddToCart = () => {
+    if (!localStorage.getItem("access_token")) {
+      navigate("/login");
+      return;
+    }
+    addToCart(product);
+  };
   return (
     <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group hover:-translate-y-1">
       {/* IMAGE */}
@@ -40,7 +52,10 @@ export default function CardHome({ product, onView }) {
             Rp {Number(product.price).toLocaleString("id-ID")}
           </p>
 
-          <button className="bg-orange-500 text-white px-3 py-1.5 rounded-full flex items-center gap-1 text-xs hover:bg-orange-600 transition">
+          <button
+            onClick={handleAddToCart}
+            className="bg-orange-500 text-white px-3 py-1.5 rounded-full flex items-center gap-1 text-xs hover:bg-orange-600 transition"
+          >
             <FaShoppingCart />
             Add
           </button>
