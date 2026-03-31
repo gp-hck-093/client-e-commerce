@@ -3,6 +3,7 @@ import api from "../api/api";
 import { useNavigate } from "react-router";
 import { Link } from "react-router";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
+import GoogleAuthButton from "../components/GoogleAuthButton";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -127,6 +128,28 @@ export default function Login() {
               )}
             </button>
           </form>
+
+          <div className="mt-8 flex flex-col gap-5">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="bg-white px-2 font-medium text-gray-400">
+                  atau masuk dengan
+                </span>
+              </div>
+            </div>
+
+            <div className="flex justify-center">
+              <GoogleAuthButton
+                setError={setError}
+                setLoading={setLoading}
+                onErrorMessage="Login Google gagal, silakan coba lagi."
+                onSuccessRedirect={() => navigate("/")}
+              />
+            </div>
+          </div>
 
           <p className="mt-8 text-center text-sm font-medium text-gray-400">
             Belum punya akun?{" "}
