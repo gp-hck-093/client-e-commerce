@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
 import { BsChatDots, BsX, BsSend, BsImage } from "react-icons/bs";
+import { useCart } from "../context/CartContext";
 
 // Sambungkan ke URL server backend Anda. (Jika dipush ke production, ganti / sesuaikan dengan env)
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:3000";
 const socket = io(SOCKET_URL);
 
 export default function Chatbot() {
+  const { fetchCart } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
@@ -20,8 +22,25 @@ export default function Chatbot() {
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  // Ambil user ID, untuk amannya saat diimplementasi sesungguhnya ambil dari Redux/Local Storage
-  const userId = 1; 
+  // Ambil user ID dari JWT token di local storage
+  const token = localStorage.getItem("access_token");
+  let userId = null;
+  if (token) {
+    try {
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        window
+          .atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join(""),
+      );
+      userId = JSON.parse(jsonPayload).id;
+    } catch (e) {
+      console.error("Error decoding token:", e);
+    }
+  }
 
   useEffect(() => {
     // Event typing indicator dari server
@@ -44,6 +63,11 @@ export default function Chatbot() {
 
     // Event ketika berhasil atau gagal menambahkan barang ke keranjang
     socket.on("cart", (data) => {
+      // 🔥 REFRESH KERANJANG DI UI JIKA BERHASIL
+      if (data.success) {
+        fetchCart();
+      }
+
       setMessages((prev) => [
         ...prev,
         {
@@ -58,7 +82,7 @@ export default function Chatbot() {
       socket.off("chat");
       socket.off("cart");
     };
-  }, []);
+  }, [fetchCart]);
 
   // Scroll otomatis ke bawah setiap kali ada pesan baru
   useEffect(() => {
