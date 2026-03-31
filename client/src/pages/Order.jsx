@@ -190,28 +190,62 @@ export default function Order() {
     sessionStorage.getItem("newOrderId") || null,
   );
 
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const { data } = await api.get("/orders", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      });
+      setOrders(data);
+    } catch (err) {
+      console.error("Failed to fetch orders:", err);
+    } finally {
+      setLoading(false);
+      sessionStorage.removeItem("newOrderId");
+    }
+  };
+
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const { data } = await api.get("/orders", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-        });
-        setOrders(data);
-      } catch (err) {
-        console.error("Failed to fetch orders:", err);
-      } finally {
-        setLoading(false);
-        sessionStorage.removeItem("newOrderId"); // hapus setelah dipakai
-      }
-    };
     fetchOrders();
   }, []);
 
-  const handlePay = (order) => {
-    // nanti disambungin ke Midtrans Snap
-    alert(`Redirecting to Midtrans payment for Order #${order.id}...`);
+  const handlePay = async (order) => {
+    try {
+      // Minta snapToken baru dari backend berdasarkan orderId
+      const { data } = await api.post(
+        `/orders/${order.id}/payment`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        },
+      );
+
+      // Buka Midtrans Snap popup
+      window.snap.pay(data.snapToken, {
+        onSuccess: (result) => {
+          console.log("Payment success:", result);
+          fetchOrders(); // refresh status order
+        },
+        onPending: (result) => {
+          console.log("Payment pending:", result);
+          fetchOrders();
+        },
+        onError: (result) => {
+          console.error("Payment error:", result);
+          alert("Payment failed. Please try again.");
+        },
+        onClose: () => {
+          console.log("Snap closed without payment");
+        },
+      });
+    } catch (err) {
+      console.error("Failed to initiate payment:", err);
+      alert("Failed to open payment. Please try again.");
+    }
   };
 
   return (
