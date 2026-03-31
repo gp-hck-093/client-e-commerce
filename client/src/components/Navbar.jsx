@@ -62,6 +62,7 @@ export default function Navbar({
 
   return (
     <div className="w-full bg-gray-100 px-6 py-3 flex items-center justify-between">
+      
       {/* LOGO */}
       <div
         onClick={() => {
