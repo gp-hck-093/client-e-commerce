@@ -2,3 +2,33 @@
 @plugin "daisyui" {
   themes: light --default;
 }
+
+@keyframes authEnterLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-24px) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) translateY(0);
+  }
+}
+
+@keyframes authEnterRight {
+  from {
+    opacity: 0;
+    transform: translateX(24px) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) translateY(0);
+  }
+}
+
+.auth-enter-left {
+  animation: authEnterLeft 420ms ease-out both;
+}
+
+.auth-enter-right {
+  animation: authEnterRight 460ms ease-out both;
+}

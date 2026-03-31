@@ -13,6 +13,10 @@ import {
 } from "react-icons/fi";
 import api from "../api/api";
 import GoogleAuthButton from "../components/GoogleAuthButton";
+import AuthShowcase from "../components/AuthShowcase";
+
+const inputClassName =
+  "block w-full rounded-2xl border border-orange-100 bg-white/90 py-4 pl-11 pr-4 text-sm font-semibold text-[#1E2A39] placeholder:text-slate-300 transition focus:border-orange-400 focus:outline-none focus:ring-4 focus:ring-orange-100";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -65,61 +69,92 @@ export default function Register() {
             </p>
           </div>
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {error && (
-              <div className="animate-shake rounded-2xl border border-red-100 bg-red-50 p-4 text-center text-xs font-bold text-[#c63125]">
-                {error}
-              </div>
-            )}
+          <div className="relative">
+            <div className="mb-8">
+              <span className="inline-flex rounded-full bg-orange-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.25em] text-orange-500">
+                Register
+              </span>
+              <h1 className="mt-4 text-4xl font-black tracking-tight text-[#1E2A39]">
+                Buat akun baru
+              </h1>
+              <p className="mt-3 text-sm leading-6 text-slate-500">
+                Simpan data pengiriman, pantau pesanan, dan nikmati flow belanja
+                yang lebih cepat seperti pengalaman di home.
+              </p>
+            </div>
 
-            <div className="space-y-4">
-              <div className="group relative text-left">
-                <label className="mb-1.5 ml-4 block text-[11px] font-bold uppercase tracking-widest text-gray-400">
-                  Nama Lengkap
-                </label>
-                <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
-                    <FiUser size={18} />
-                  </div>
-                  <input
-                    type="text"
-                    required
-                    className="block w-full rounded-2xl border border-gray-100 bg-gray-50 py-4 pl-11 pr-4 text-sm font-bold text-[#1E2A39] placeholder-gray-300 transition-all focus:border-[#c63125] focus:outline-none focus:ring-2 focus:ring-[#c63125]/20 group-hover:border-gray-200"
-                    placeholder="Contoh: Budi Santoso"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    disabled={loading}
-                  />
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              {error && (
+                <div className="rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-[#c63125]">
+                  {error}
                 </div>
-              </div>
+              )}
 
-              <div className="group relative text-left">
-                <label className="mb-1.5 ml-4 block text-[11px] font-bold uppercase tracking-widest text-gray-400">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
-                    <FiMail size={18} />
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="group relative text-left md:col-span-2">
+                  <label className="mb-2 ml-1 block text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400">
+                    Nama Lengkap
+                  </label>
+                  <div className="relative">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
+                      <FiUser size={18} />
+                    </div>
+                    <input
+                      type="text"
+                      required
+                      className={inputClassName}
+                      placeholder="Contoh: Budi Santoso"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      disabled={loading}
+                    />
                   </div>
-                  <input
-                    type="email"
-                    required
-                    className="block w-full rounded-2xl border border-gray-100 bg-gray-50 py-4 pl-11 pr-4 text-sm font-bold text-[#1E2A39] placeholder-gray-300 transition-all focus:border-[#c63125] focus:outline-none focus:ring-2 focus:ring-[#c63125]/20 group-hover:border-gray-200"
-                    placeholder="nama@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={loading}
-                  />
                 </div>
-              </div>
 
-              <div className="group relative text-left">
-                <label className="mb-1.5 ml-4 block text-[11px] font-bold uppercase tracking-widest text-gray-400">
-                  Password
-                </label>
-                <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
-                    <FiLock size={18} />
+                <div className="group relative text-left">
+                  <label className="mb-2 ml-1 block text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
+                      <FiMail size={18} />
+                    </div>
+                    <input
+                      type="email"
+                      required
+                      className={inputClassName}
+                      placeholder="nama@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
+
+                <div className="group relative text-left">
+                  <label className="mb-2 ml-1 block text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
+                      <FiLock size={18} />
+                    </div>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      required
+                      className={`${inputClassName} pr-12`}
+                      placeholder="Minimal 8 karakter"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 transition hover:text-[#1E2A39]"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    </button>
                   </div>
                   <input
                     type={showPassword ? "text" : "password"}
@@ -142,8 +177,6 @@ export default function Register() {
                     )}
                   </button>
                 </div>
-              </div>
-            </div>
 
             <div className="group relative text-left">
               <label className="mb-1.5 ml-4 block text-[11px] font-bold uppercase tracking-widest text-gray-400">
@@ -185,12 +218,12 @@ export default function Register() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 px-2">
-              <FiShield size={16} className="text-green-500" />
-              <p className="text-[10px] font-medium text-gray-400">
-                Data kamu aman dan terenkripsi bersama kami.
-              </p>
-            </div>
+              <div className="flex items-center gap-3 rounded-2xl bg-orange-50 px-4 py-3">
+                <FiShield size={16} className="text-orange-500" />
+                <p className="text-xs font-medium text-slate-500">
+                  Data kamu aman dan terenkripsi bersama ZapShop.
+                </p>
+              </div>
 
             <button
               type="submit"
@@ -222,15 +255,18 @@ export default function Register() {
                 </span>
               </div>
             </div>
-            <div className="flex justify-center">
-              <GoogleAuthButton
-                setError={setError}
-                setLoading={setLoading}
-                onErrorMessage="Register dengan Google gagal, silakan coba lagi."
-                onSuccessRedirect={() => navigate("/")}
-              />
-            </div>
+
+            <p className="mt-8 text-center text-sm font-medium text-slate-400">
+              Sudah punya akun?{" "}
+              <Link
+                to="/login"
+                className="font-bold text-orange-500 transition hover:text-orange-600"
+              >
+                Masuk di sini
+              </Link>
+            </p>
           </div>
+        </div>
 
           <p className="mt-8 text-center text-sm font-medium text-gray-400">
             Sudah punya akun?{" "}
