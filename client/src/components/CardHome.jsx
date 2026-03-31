@@ -1,26 +1,26 @@
-import { FaStar, FaShoppingCart, FaEye } from "react-icons/fa";
-import { useNavigate } from "react-router";
+import { FaShoppingCart, FaEye } from "react-icons/fa";
 
-export default function CardHome({ product }) {
-  const navigate = useNavigate();
-
+export default function CardHome({ product, onView }) {
   return (
-    <div className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden group">
+    <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group hover:-translate-y-1">
       {/* IMAGE */}
-      <div className="relative">
-        <img src={product.imageUrl} className="w-full h-75 object-cover" />
+      <div className="relative overflow-hidden">
+        <img
+          src={product.imageUrl}
+          alt={product.name}
+          className="w-full h-64 object-cover group-hover:scale-105 transition duration-300"
+        />
 
-        {/* CATEGORY */}
-        <span className="absolute bottom-3 left-3 bg-purple-500 text-white text-xs px-3 py-1 rounded-full">
-          Category
+        {/* CATEGORY BADGE */}
+        <span className="absolute bottom-3 left-3 bg-purple-500 text-white text-xs px-3 py-1 rounded-full shadow">
+          {product.Category?.name || "Category"}
         </span>
 
-        {/* HOVER OVERLAY */}
+        {/* VIEW DETAIL */}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-          {/* VIEW DETAIL */}
           <button
-            onClick={() => navigate(`/products/${product.id}`)}
-            className="bg-white p-3 rounded-full hover:bg-orange-500 hover:text-white transition"
+            onClick={() => onView(product.id)}
+            className="bg-white p-3 rounded-full hover:bg-orange-500 hover:text-white transition shadow-md"
           >
             <FaEye />
           </button>
@@ -28,29 +28,19 @@ export default function CardHome({ product }) {
       </div>
 
       {/* CONTENT */}
-      <div className="p-4">
-        <h3 className="font-semibold text-sm mb-1">{product.name}</h3>
+      <div className="p-4 flex flex-col gap-3">
+        {/* TITLE (ENLARGED) */}
+        <h3 className="font-semibold text-base line-clamp-2 leading-snug">
+          {product.name}
+        </h3>
 
-        <p className="text-xs text-gray-500 truncate">{product.description}</p>
+        {/* PRICE + BUTTON */}
+        <div className="flex justify-between items-center mt-1">
+          <p className="text-orange-500 font-bold text-lg">
+            Rp {Number(product.price).toLocaleString("id-ID")}
+          </p>
 
-        {/* RATING */}
-        <div className="flex items-center gap-1 text-yellow-400 text-sm mt-2">
-          <FaStar />
-          <FaStar />
-          <FaStar />
-          <FaStar />
-          <FaStar className="text-gray-300" />
-          <span className="text-gray-500 text-xs">(120)</span>
-        </div>
-
-        {/* STOCK */}
-        <p className="text-xs text-gray-400 mt-1">{product.qty} in stock</p>
-
-        {/* PRICE */}
-        <div className="flex justify-between items-center mt-3">
-          <p className="text-orange-500 font-bold">${product.price}</p>
-
-          <button className="bg-orange-500 text-white px-3 py-1 rounded-full flex items-center gap-1 text-sm">
+          <button className="bg-orange-500 text-white px-3 py-1.5 rounded-full flex items-center gap-1 text-xs hover:bg-orange-600 transition">
             <FaShoppingCart />
             Add
           </button>

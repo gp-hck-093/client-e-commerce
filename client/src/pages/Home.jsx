@@ -1,69 +1,67 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useOutletContext } from "react-router";
+import api from "../api/api";
 import CarouselHome from "../components/CarouselHome";
 import CardHome from "../components/CardHome";
 import Pagination from "../components/Pagination";
+import ProductDetail from "../components/ProductDetail";
 
 export default function Home() {
+  // 🔥 GET FILTER STATE FROM NAVBAR (via MainLayout)
+  const { search, category, brand, sort } = useOutletContext();
+
   const [currentPage, setCurrentPage] = useState(1);
+  const [products, setProducts] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalData, setTotalData] = useState(0);
 
-  // TEMP DATA
-  const products = [
-    {
-      id: 1,
-      name: "Wireless Headphones",
-      price: 79.99,
-      qty: 42,
-      description: "Premium headphones",
-      imageUrl: "https://images.unsplash.com/photo-1518444065439-e933c06ce9cd",
-    },
-    {
-      id: 2,
-      name: "Running Sneakers",
-      price: 94.99,
-      qty: 85,
-      description: "Lightweight shoes",
-      imageUrl: "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
-    },
-    {
-      id: 3,
-      name: "Smart Watch",
-      price: 149.99,
-      qty: 30,
-      description: "Fitness tracking",
-      imageUrl: "https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b",
-    },
-    {
-      id: 4,
-      name: "Leather Bag",
-      price: 119.99,
-      qty: 18,
-      description: "Premium bag",
-      imageUrl: "https://images.unsplash.com/photo-1584917865442-de89df76afd3",
-    },
-    {
-      id: 5,
-      name: "Sunglasses",
-      price: 59.99,
-      qty: 20,
-      description: "Stylish sunglasses",
-      imageUrl: "https://images.unsplash.com/photo-1511499767150-a48a237f0083",
-    },
-    {
-      id: 6,
-      name: "Laptop Stand",
-      price: 39.99,
-      qty: 15,
-      description: "Ergonomic stand",
-      imageUrl: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8",
-    },
-  ];
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
-  // PAGINATION LOGIC (FRONTEND ONLY FOR NOW)
-  const itemsPerPage = 4;
-  const totalPages = Math.ceil(products.length / itemsPerPage);
+  const limit = 10;
 
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentProducts = products.slice(startIndex, startIndex + itemsPerPage);
+  // 🔥 FETCH PRODUCTS WITH FILTER
+  const fetchProducts = async () => {
+    try {
+      const { data } = await api.get("/products", {
+        params: {
+          page: currentPage,
+          limit,
+          search,
+          category,
+          brand,
+          sort,
+        },
+      });
+
+      setProducts(data.data);
+      setTotalPages(data.totalPage);
+      setTotalData(data.totalData);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // 🔥 FETCH DETAIL (MODAL)
+  const handleViewDetail = async (id) => {
+    try {
+      const { data } = await api.get(`/products/${id}`);
+      setSelectedProduct(data);
+      setShowModal(true);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // 🔥 FETCH WHEN PAGE OR FILTER CHANGES
+  useEffect(() => {
+    fetchProducts();
+  }, [currentPage, search, category, brand, sort]);
+
+  // 🔥 RESET PAGE WHEN FILTER CHANGES
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, category, brand, sort]);
 
   return (
     <div className="px-6 py-4 space-y-6 pb-16">
@@ -72,15 +70,17 @@ export default function Home() {
       {/* HEADER */}
       <div>
         <h2 className="text-xl font-semibold">All Products</h2>
-        <p className="text-sm text-gray-400">
-          {products.length} products found
-        </p>
+        <p className="text-sm text-gray-400">{totalData} products found</p>
       </div>
 
       {/* GRID */}
-      <div className="grid grid-cols-4 gap-6">
-        {currentProducts.map((product) => (
-          <CardHome key={product.id} product={product} />
+      <div className="grid grid-cols-5 gap-6">
+        {products.map((product) => (
+          <CardHome
+            key={product.id}
+            product={product}
+            onView={handleViewDetail}
+          />
         ))}
       </div>
 
@@ -88,8 +88,19 @@ export default function Home() {
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
-        onPageChange={(page) => setCurrentPage(page)}
+        onPageChange={(page) => {
+          setCurrentPage(page);
+          window.scrollTo({ top: 0, behavior: "smooth" }); // UX upgrade
+        }}
       />
+
+      {/* MODAL */}
+      {showModal && (
+        <ProductDetail
+          product={selectedProduct}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 }
