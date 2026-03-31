@@ -26,7 +26,9 @@ export default function Login() {
       localStorage.setItem("access_token", data.access_token);
       navigate("/");
     } catch (err) {
-      setError(err.response?.data?.message || "Login gagal, silakan coba lagi.");
+      setError(
+        err.response?.data?.message || "Login gagal, silakan coba lagi.",
+      );
     } finally {
       setLoading(false);
     }
@@ -107,7 +109,11 @@ export default function Login() {
                       className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 transition hover:text-[#1E2A39]"
                       onClick={() => setShowPassword(!showPassword)}
                     >
-                      {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                      {showPassword ? (
+                        <FiEyeOff size={18} />
+                      ) : (
+                        <FiEye size={18} />
+                      )}
                     </button>
                   </div>
                 </div>
