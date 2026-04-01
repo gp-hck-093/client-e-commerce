@@ -18,6 +18,9 @@ const withImageVersion = (imageUrl) => {
   return `${imageUrl}${separator}t=${Date.now()}`;
 };
 
+const navIconButtonClass =
+  "flex h-10 w-10 items-center justify-center rounded-full border border-transparent bg-white/70 text-gray-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50 hover:text-orange-500 hover:shadow-md active:scale-95 active:bg-orange-100";
+
 export default function Navbar({
   onSearch,
   onCategory,
@@ -34,10 +37,8 @@ export default function Navbar({
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const profileMenuRef = useRef(null);
 
-  // 🔥 CHECK LOGIN
   const isLogin = !!localStorage.getItem("access_token");
 
-  // FETCH FILTER DATA
   useEffect(() => {
     fetchFilters();
   }, []);
@@ -73,7 +74,6 @@ export default function Navbar({
     }
   };
 
-  //GET PROFILE
   useEffect(() => {
     if (isLogin) {
       fetchProfile();
@@ -106,7 +106,6 @@ export default function Navbar({
       window.removeEventListener("profile-updated", handleProfileUpdated);
   }, []);
 
-  // SEARCH DEBOUNCE
   useEffect(() => {
     const delay = setTimeout(() => {
       onSearch(keyword);
@@ -115,7 +114,6 @@ export default function Navbar({
     return () => clearTimeout(delay);
   }, [keyword]);
 
-  // LOGOUT
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     setProfileMenuOpen(false);
@@ -123,8 +121,7 @@ export default function Navbar({
   };
 
   return (
-    <div className="w-full bg-gray-100 px-6 py-3 flex items-center justify-between">
-      {/* LOGO */}
+    <div className="flex w-full items-center justify-between bg-gray-100 px-6 py-3">
       <div
         onClick={() => {
           setKeyword("");
@@ -132,23 +129,22 @@ export default function Navbar({
           navigate("/");
           window.scrollTo({ top: 0, behavior: "smooth" });
         }}
-        className="flex items-center gap-2 cursor-pointer"
+        className="flex cursor-pointer items-center gap-2 rounded-full px-2 py-1 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/70 hover:shadow-sm active:scale-95"
       >
-        <div className="bg-orange-500 text-white p-2 rounded-full">⚡</div>
+        <div className="rounded-full bg-orange-500 p-2 text-white">⚡</div>
         <h1 className="text-lg font-semibold">
           <span className="text-orange-500">Zap</span>
           <span className="text-pink-500">Shop</span>
         </h1>
       </div>
 
-      {/* SEARCH + FILTER */}
-      <div className="flex items-center bg-white rounded-full border px-3 py-2 gap-2 relative">
+      <div className="relative flex items-center gap-2 rounded-full border bg-white px-3 py-2">
         <FaSearch className="text-gray-400" />
 
         <input
           type="text"
           placeholder="Search products..."
-          className="outline-none text-sm w-60"
+          className="w-60 text-sm outline-none"
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
         />
@@ -169,34 +165,52 @@ export default function Navbar({
         />
       </div>
 
-      {/* 🔥 RIGHT ICONS (CONDITIONAL) */}
-      <div className="flex items-center gap-6 text-gray-600 text-lg">
-        {/* 🌙 THEME BUTTON */}
-        <FaMoon className="cursor-pointer hover:text-orange-500 transition" />
+      <div className="flex items-center gap-3 text-lg text-gray-600">
+        {/* <button type="button" className={navIconButtonClass}>
+          <FaMoon />
+        </button> */}
 
-        {/* ❌ NOT LOGIN */}
         {!isLogin && (
-          <FaSignInAlt
-            className="cursor-pointer hover:text-orange-500 transition"
+          <button
+            type="button"
+            className={navIconButtonClass}
             onClick={() => navigate("/login")}
-          />
+          >
+            <FaSignInAlt />
+          </button>
         )}
 
-        {/* ✅ LOGIN */}
         {isLogin && (
           <>
-            <FaShoppingCart onClick={() => navigate("/cart")} />
-            <FaReceipt onClick={() => navigate("/orders")} />
+            <button
+              type="button"
+              className={navIconButtonClass}
+              onClick={() => navigate("/cart")}
+            >
+              <FaShoppingCart />
+            </button>
+
+            <button
+              type="button"
+              className={navIconButtonClass}
+              onClick={() => navigate("/orders")}
+            >
+              <FaReceipt />
+            </button>
 
             <div className="relative" ref={profileMenuRef}>
               <button
                 type="button"
                 onClick={() => setProfileMenuOpen((prev) => !prev)}
-                className="flex items-center gap-2 rounded-full border border-orange-100 bg-white/90 px-2 py-1 shadow-sm transition hover:border-orange-300 hover:shadow-md"
+                className={`flex items-center gap-2 rounded-full border bg-white/90 px-2 py-1 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:scale-95 ${
+                  profileMenuOpen
+                    ? "border-orange-300 bg-orange-50 shadow-md"
+                    : "border-orange-100 hover:border-orange-300"
+                }`}
               >
                 <img
                   src={user?.imageUrl || defaultProfileImage}
-                  className="w-8 h-8 rounded-full object-cover"
+                  className="h-8 w-8 rounded-full object-cover"
                 />
                 <div className="hidden text-left md:block">
                   <p className="max-w-28 truncate text-xs font-semibold text-gray-800">
@@ -225,7 +239,7 @@ export default function Navbar({
                         setProfileMenuOpen(false);
                         navigate("/edit-profile");
                       }}
-                      className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-gray-700 transition hover:bg-orange-50 hover:text-orange-600"
+                      className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-gray-700 transition hover:bg-orange-50 hover:text-orange-600 active:scale-[0.99]"
                     >
                       <FaUserEdit className="text-orange-500" />
                       Edit Profile
@@ -234,7 +248,7 @@ export default function Navbar({
                     <button
                       type="button"
                       onClick={handleLogout}
-                      className="mt-2 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-red-500 transition hover:bg-red-50"
+                      className="mt-2 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-red-500 transition hover:bg-red-50 active:scale-[0.99]"
                     >
                       <FaSignOutAlt />
                       Logout
@@ -249,10 +263,6 @@ export default function Navbar({
     </div>
   );
 }
-
-//////////////////////////////////////////////////////
-// DROPDOWN (UNCHANGED)
-//////////////////////////////////////////////////////
 
 function Dropdown({ label, options, onChange }) {
   const [open, setOpen] = useState(false);
@@ -273,21 +283,23 @@ function Dropdown({ label, options, onChange }) {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="text-sm px-3 py-1 border-l flex items-center gap-1 hover:text-orange-500"
+        className={`flex items-center gap-1 rounded-full border-l px-3 py-1 text-sm transition-all duration-200 hover:bg-orange-50 hover:text-orange-500 active:scale-95 ${
+          open ? "text-orange-500" : ""
+        }`}
       >
         {selected || `All ${label}`}
         <span className="text-xs">▾</span>
       </button>
 
       {open && (
-        <div className="absolute top-10 left-0 w-52 bg-white border rounded-xl shadow-lg max-h-60 overflow-y-auto z-50">
+        <div className="absolute left-0 top-10 z-50 max-h-60 w-52 overflow-y-auto rounded-xl border bg-white shadow-lg">
           <div
             onClick={() => {
               setSelected("");
               onChange("");
               setOpen(false);
             }}
-            className="px-3 py-2 hover:bg-orange-50 cursor-pointer text-sm font-medium"
+            className="cursor-pointer px-3 py-2 text-sm font-medium transition hover:bg-orange-50"
           >
             All {label}
           </div>
@@ -300,7 +312,7 @@ function Dropdown({ label, options, onChange }) {
                 onChange(item.id);
                 setOpen(false);
               }}
-              className="px-3 py-2 hover:bg-orange-50 cursor-pointer text-sm"
+              className="cursor-pointer px-3 py-2 text-sm transition hover:bg-orange-50"
             >
               {item.name}
             </div>
