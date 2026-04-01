@@ -137,7 +137,7 @@ export default function Register() {
                       type={showPassword ? "text" : "password"}
                       required
                       className={`${inputClassName} pr-12`}
-                      placeholder="Minimal 8 karakter"
+                      placeholder="Minimal 6 karakter"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       disabled={loading}
