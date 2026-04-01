@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import api from "../api/api";
+import defaultProfileImage from "../assets/profile-default.png";
 import {
   FaSearch,
   FaShoppingCart,
@@ -8,7 +9,14 @@ import {
   FaSignOutAlt,
   FaMoon,
   FaSignInAlt,
+  FaUserEdit,
 } from "react-icons/fa";
+
+const withImageVersion = (imageUrl) => {
+  if (!imageUrl) return defaultProfileImage;
+  const separator = imageUrl.includes("?") ? "&" : "?";
+  return `${imageUrl}${separator}t=${Date.now()}`;
+};
 
 export default function Navbar({
   onSearch,
@@ -23,6 +31,8 @@ export default function Navbar({
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
   const [user, setUser] = useState(null);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef(null);
 
   // 🔥 CHECK LOGIN
   const isLogin = !!localStorage.getItem("access_token");
@@ -46,18 +56,54 @@ export default function Navbar({
     }
   };
 
+  const fetchProfile = async () => {
+    try {
+      const res = await api.get("/auth/profile", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      });
+
+      setUser({
+        ...res.data.data,
+        imageUrl: withImageVersion(res.data.data.imageUrl),
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   //GET PROFILE
   useEffect(() => {
     if (isLogin) {
-      api
-        .get("/auth/profile", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-        })
-        .then((res) => setUser(res.data.data))
-        .catch(console.log);
+      fetchProfile();
     }
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!profileMenuRef.current?.contains(e.target)) {
+        setProfileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const handleProfileUpdated = (event) => {
+      if (event.detail) {
+        setUser(event.detail);
+        return;
+      }
+
+      fetchProfile();
+    };
+
+    window.addEventListener("profile-updated", handleProfileUpdated);
+    return () =>
+      window.removeEventListener("profile-updated", handleProfileUpdated);
   }, []);
 
   // SEARCH DEBOUNCE
@@ -72,6 +118,7 @@ export default function Navbar({
   // LOGOUT
   const handleLogout = () => {
     localStorage.removeItem("access_token");
+    setProfileMenuOpen(false);
     navigate("/login");
   };
 
@@ -138,15 +185,64 @@ export default function Navbar({
         {/* ✅ LOGIN */}
         {isLogin && (
           <>
-            <img
-              src={user?.imageUrl || "https://via.placeholder.com/40"}
-              className="w-8 h-8 rounded-full cursor-pointer"
-              onClick={() => navigate("/edit-profile")}
-            />
-
             <FaShoppingCart onClick={() => navigate("/cart")} />
             <FaReceipt onClick={() => navigate("/orders")} />
-            <FaSignOutAlt onClick={handleLogout} />
+
+            <div className="relative" ref={profileMenuRef}>
+              <button
+                type="button"
+                onClick={() => setProfileMenuOpen((prev) => !prev)}
+                className="flex items-center gap-2 rounded-full border border-orange-100 bg-white/90 px-2 py-1 shadow-sm transition hover:border-orange-300 hover:shadow-md"
+              >
+                <img
+                  src={user?.imageUrl || defaultProfileImage}
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+                <div className="hidden text-left md:block">
+                  <p className="max-w-28 truncate text-xs font-semibold text-gray-800">
+                    {user?.username || "My Account"}
+                  </p>
+                  <p className="text-[11px] text-orange-500">Manage Account</p>
+                </div>
+              </button>
+
+              {profileMenuOpen && (
+                <div className="absolute right-0 top-14 z-50 w-64 overflow-hidden rounded-2xl border border-orange-100 bg-white shadow-xl">
+                  <div className="bg-gradient-to-r from-orange-500 via-orange-400 to-amber-300 p-4 text-white">
+                    <p className="text-sm opacity-90">Signed in as</p>
+                    <p className="truncate text-base font-semibold">
+                      {user?.username || "User"}
+                    </p>
+                    <p className="truncate text-xs opacity-90">
+                      {user?.email || "Welcome back to ZapShop"}
+                    </p>
+                  </div>
+
+                  <div className="p-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProfileMenuOpen(false);
+                        navigate("/edit-profile");
+                      }}
+                      className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-gray-700 transition hover:bg-orange-50 hover:text-orange-600"
+                    >
+                      <FaUserEdit className="text-orange-500" />
+                      Edit Profile
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="mt-2 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-red-500 transition hover:bg-red-50"
+                    >
+                      <FaSignOutAlt />
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </>
         )}
       </div>
