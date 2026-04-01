@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
 import { BsChatDots, BsX, BsSend, BsImage, BsRobot } from "react-icons/bs";
+import Swal from "sweetalert2";
 
 import { useCart } from "../context/CartContext";
 
@@ -96,7 +97,12 @@ export default function Chatbot() {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) { // Limit 2MB for safe Base64 websocket transmission
-        alert("Gambar tidak boleh lebih dari 2MB agar lebih ringan dikirim ya.");
+        Swal.fire({
+          icon: "warning",
+          title: "Ukuran gambar terlalu besar",
+          text: "Gambar tidak boleh lebih dari 2MB agar lebih ringan dikirim ya.",
+          confirmButtonColor: "#f97316",
+        });
         return;
       }
       const reader = new FileReader();

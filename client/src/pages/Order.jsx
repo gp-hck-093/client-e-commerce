@@ -9,6 +9,7 @@ import {
   FaReceipt,
 } from "react-icons/fa";
 import api from "../api/api";
+import Swal from "sweetalert2";
 
 const STATUS_CONFIG = {
   pending: {
@@ -46,21 +47,41 @@ const handlePay = async (order) => {
     const snapToken = data.snapToken;
 
     window.snap.pay(snapToken, {
-      onSuccess: function (result) {
-        alert("Payment success!");
+      onSuccess: async function (result) {
+        await Swal.fire({
+          icon: "success",
+          title: "Payment success",
+          text: "Your payment was completed successfully.",
+          confirmButtonColor: "#f97316",
+        });
         console.log(result);
         window.location.reload();
       },
       onPending: function (result) {
-        alert("Payment pending!");
+        Swal.fire({
+          icon: "info",
+          title: "Payment pending",
+          text: "Your payment is still being processed.",
+          confirmButtonColor: "#f97316",
+        });
         console.log(result);
       },
       onError: function (result) {
-        alert("Payment failed!");
+        Swal.fire({
+          icon: "error",
+          title: "Payment failed",
+          text: "There was a problem while processing your payment.",
+          confirmButtonColor: "#f97316",
+        });
         console.log(result);
       },
       onClose: function () {
-        alert("Payment popup closed");
+        Swal.fire({
+          icon: "warning",
+          title: "Payment popup closed",
+          text: "You closed the payment window before finishing.",
+          confirmButtonColor: "#f97316",
+        });
       },
     });
   } catch (error) {
@@ -279,7 +300,12 @@ export default function Order() {
       setSelectedOrderToCancel(null);
     } catch (error) {
       console.error("Cancel error:", error);
-      alert(error.response?.data?.message || "Failed to cancel order");
+      Swal.fire({
+        icon: "error",
+        title: "Cancel failed",
+        text: error.response?.data?.message || "Failed to cancel order",
+        confirmButtonColor: "#f97316",
+      });
     }
   };
 
