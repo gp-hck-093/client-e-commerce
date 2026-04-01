@@ -144,73 +144,59 @@ export default function Register() {
                     />
                     <button
                       type="button"
-                      className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 transition hover:text-[#1E2A39]"
+                      className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-[#1E2A39]"
                       onClick={() => setShowPassword(!showPassword)}
                     >
-                      {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                      {showPassword ? (
+                        <FiEyeOff size={18} />
+                      ) : (
+                        <FiEye size={18} />
+                      )}
                     </button>
                   </div>
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    required
-                    className="block w-full rounded-2xl border border-gray-100 bg-gray-50 py-4 pl-11 pr-12 text-sm font-bold text-[#1E2A39] placeholder-gray-300 transition-all focus:border-[#c63125] focus:outline-none focus:ring-2 focus:ring-[#c63125]/20 group-hover:border-gray-200"
-                    placeholder="Min. 8 Karakter"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={loading}
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-[#1E2A39]"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <FiEyeOff size={18} />
-                    ) : (
-                      <FiEye size={18} />
-                    )}
-                  </button>
                 </div>
 
-            <div className="group relative text-left">
-              <label className="mb-1.5 ml-4 block text-[11px] font-bold uppercase tracking-widest text-gray-400">
-                Phone Number
-              </label>
-              <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
-                  <FiPhone size={18} />
+                {/* PHONE */}
+                <div className="group relative text-left md:col-span-2">
+                  <label className="mb-2 ml-1 block text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400">
+                    Phone Number
+                  </label>
+                  <div className="relative">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
+                      <FiPhone size={18} />
+                    </div>
+                    <input
+                      type="number"
+                      required
+                      className={inputClassName}
+                      placeholder="08xx-xxxx-xxxx"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      disabled={loading}
+                    />
+                  </div>
                 </div>
-                <input
-                  type="tel"
-                  required
-                  className="block w-full rounded-2xl border border-gray-100 bg-gray-50 py-4 pl-11 pr-4 text-sm font-bold text-[#1E2A39] placeholder-gray-300 transition-all focus:border-[#c63125] focus:outline-none focus:ring-2 focus:ring-[#c63125]/20 group-hover:border-gray-200"
-                  placeholder="08xx-xxxx-xxxx"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  disabled={loading}
-                />
-              </div>
-            </div>
 
-            <div className="group relative text-left">
-              <label className="mb-1.5 ml-4 block text-[11px] font-bold uppercase tracking-widest text-gray-400">
-                Address
-              </label>
-              <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
-                  <FiMapPin size={18} />
+                <div className="group relative text-left md:col-span-2">
+                  <label className="mb-2 ml-1 block text-[11px] font-bold uppercase tracking-[0.25em] text-slate-400">
+                    Address
+                  </label>
+                  <div className="relative">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
+                      <FiMapPin size={18} />
+                    </div>
+                    <input
+                      type="text"
+                      required
+                      className={inputClassName}
+                      placeholder="Jalan, Kelurahan, Kota"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      disabled={loading}
+                    />
+                  </div>
                 </div>
-                <input
-                  type="text"
-                  required
-                  className="block w-full rounded-2xl border border-gray-100 bg-gray-50 py-4 pl-11 pr-4 text-sm font-bold text-[#1E2A39] placeholder-gray-300 transition-all focus:border-[#c63125] focus:outline-none focus:ring-2 focus:ring-[#c63125]/20 group-hover:border-gray-200"
-                  placeholder="Jalan, Kelurahan, Kota"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  disabled={loading}
-                />
               </div>
-            </div>
 
               <div className="flex items-center gap-3 rounded-2xl bg-orange-50 px-4 py-3">
                 <FiShield size={16} className="text-orange-500" />
