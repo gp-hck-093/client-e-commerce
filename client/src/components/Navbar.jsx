@@ -22,6 +22,7 @@ export default function Navbar({
   const [keyword, setKeyword] = useState("");
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
+  const [user, setUser] = useState(null);
 
   // 🔥 CHECK LOGIN
   const isLogin = !!localStorage.getItem("access_token");
@@ -45,6 +46,20 @@ export default function Navbar({
     }
   };
 
+  //GET PROFILE
+  useEffect(() => {
+    if (isLogin) {
+      api
+        .get("/auth/profile", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        })
+        .then((res) => setUser(res.data.data))
+        .catch(console.log);
+    }
+  }, []);
+
   // SEARCH DEBOUNCE
   useEffect(() => {
     const delay = setTimeout(() => {
@@ -62,7 +77,6 @@ export default function Navbar({
 
   return (
     <div className="w-full bg-gray-100 px-6 py-3 flex items-center justify-between">
-      
       {/* LOGO */}
       <div
         onClick={() => {
@@ -124,20 +138,15 @@ export default function Navbar({
         {/* ✅ LOGIN */}
         {isLogin && (
           <>
-            <FaReceipt
-              className="cursor-pointer hover:text-orange-500 transition"
-              onClick={() => navigate("/orders")}
+            <img
+              src={user?.imageUrl || "https://via.placeholder.com/40"}
+              className="w-8 h-8 rounded-full cursor-pointer"
+              onClick={() => navigate("/edit-profile")}
             />
 
-            <FaShoppingCart
-              className="cursor-pointer hover:text-orange-500 transition"
-              onClick={() => navigate("/cart")}
-            />
-
-            <FaSignOutAlt
-              className="cursor-pointer hover:text-red-500 transition"
-              onClick={handleLogout}
-            />
+            <FaShoppingCart onClick={() => navigate("/cart")} />
+            <FaReceipt onClick={() => navigate("/orders")} />
+            <FaSignOutAlt onClick={handleLogout} />
           </>
         )}
       </div>
