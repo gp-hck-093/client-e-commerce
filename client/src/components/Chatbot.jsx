@@ -124,7 +124,8 @@ export default function Chatbot() {
     const payload = { 
       message: input.trim() || "Tolong carikan produk untuk gambar ini", 
       userId,
-      imageUrl: imagePreview || null 
+      imageUrl: imagePreview || null,
+      chatHistory: messages.slice(-5).map(m => ({ sender: m.sender, text: m.text }))
     };
     socket.emit("chat", payload);
     
