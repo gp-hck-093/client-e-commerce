@@ -12,6 +12,7 @@ import Home from "./pages/Home";
 import ProductDetail from "./components/ProductDetail";
 import Cart from "./pages/Cart";
 import Order from "./pages/Order";
+import EditProfile from "./pages/EditProfile";
 
 function App() {
   return (
@@ -30,6 +31,15 @@ function App() {
         <Route path="/products/:id" element={<ProductDetail />} />
 
         {/* PROTECTED ROUTES */}
+        <Route
+          path="/edit-profile"
+          element={
+            <ProtectedRoute>
+              <EditProfile />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/cart"
           element={
