@@ -119,13 +119,25 @@ export default function Login() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 text-xs text-slate-500">
+              {/* <div className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 text-xs text-slate-500">
                 <span>Akun baru? Daftar dalam beberapa detik.</span>
+                <div className="flex items-center gap-4">
+                  <Link
+                    to="/forgot-password"
+                    className="font-bold text-slate-500 transition hover:text-[#1E2A39]"
+                  >
+                    Lupa password?
+                  </Link>
+                </div>
+              </div> */}
+
+              <div className="flex items-center justify-end">
                 <Link
-                  to="/register"
-                  className="font-bold text-orange-500 transition hover:text-orange-600"
+                  to="/forgot-password"
+                  size="sm"
+                  className="text-xs font-bold text-[#c63125] hover:underline"
                 >
-                  Buat akun
+                  Lupa Password?
                 </Link>
               </div>
 
